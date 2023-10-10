@@ -14,6 +14,7 @@ VELOCIDAD_ENEMIGO = 2
 
 ROJO =  (255,  0,  0)
 NEGRO = (  0,  0,  0)
+BLANCO =(255,255,255)
 AZUL =  (  0,  0,255)
 
 MAPA = [

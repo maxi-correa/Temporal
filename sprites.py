@@ -53,15 +53,23 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
     def movimiento(self):
         teclas = pygame.key.get_pressed()#Lista de todas las teclas que pueden ser apretadas
         if teclas[pygame.K_LEFT]:
+            for sprite in self.juego.todos_sprites:
+                sprite.rect.x += VELOCIDAD_JUGADOR
             self.x_cambio -= VELOCIDAD_JUGADOR
             self.direccion = 'izquierda'
         if teclas[pygame.K_RIGHT]:
+            for sprite in self.juego.todos_sprites:
+                sprite.rect.x -= VELOCIDAD_JUGADOR
             self.x_cambio += VELOCIDAD_JUGADOR
             self.direccion = 'derecha'
         if teclas[pygame.K_UP]:
+            for sprite in self.juego.todos_sprites:
+                sprite.rect.y += VELOCIDAD_JUGADOR
             self.y_cambio -= VELOCIDAD_JUGADOR
             self.direccion = 'arriba'
         if teclas[pygame.K_DOWN]:
+            for sprite in self.juego.todos_sprites:
+                sprite.rect.y -= VELOCIDAD_JUGADOR
             self.y_cambio += VELOCIDAD_JUGADOR
             self.direccion = 'abajo'
     
@@ -77,16 +85,24 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
             if choque:
                 if self.x_cambio > 0:
                     self.rect.x = choque[0].rect.left - self.rect.width
+                    for sprite in self.juego.todos_sprites:
+                        sprite.rect.x += VELOCIDAD_JUGADOR
                 if self.x_cambio < 0:
                     self.rect.x = choque[0].rect.right
+                    for sprite in self.juego.todos_sprites:
+                        sprite.rect.x -= VELOCIDAD_JUGADOR
         if direccion == "y":
             choque = pygame.sprite.spritecollide(self, self.juego.arboles, False)
             if choque:
-                    if self.y_cambio > 0:
-                        self.rect.y = choque[0].rect.top - self.rect.height
-                    if self.y_cambio < 0:
-                        self.rect.y = choque[0].rect.bottom
-    
+                if self.y_cambio > 0:
+                    self.rect.y = choque[0].rect.top - self.rect.height
+                    for sprite in self.juego.todos_sprites:
+                        sprite.rect.y += VELOCIDAD_JUGADOR
+                if self.y_cambio < 0:
+                    self.rect.y = choque[0].rect.bottom
+                    for sprite in self.juego.todos_sprites:
+                        sprite.rect.y -= VELOCIDAD_JUGADOR
+
     def animacion(self):
         
         animaciones_bajar = [self.juego.plantilla_jugador.get_plantilla(3, 2, self.ancho, self.alto),
@@ -254,3 +270,34 @@ class Piso(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
+
+class Boton:
+    def __init__(self, x, y , ancho, alto, color_fuente, color_fondo, contenido, tamaño):
+        self.fuente = pygame.font.Font('Arial.ttf', tamaño)
+        self.contenido = contenido
+        
+        self.x = x
+        self.y = y
+        self.ancho = ancho
+        self.alto = alto
+        
+        self.color_fuente = color_fuente
+        self.color_fondo = color_fondo
+        
+        self.image = pygame.Surface((self.ancho, self.alto))
+        self.image.fill(self.color_fondo)
+        self.rect = self.image.get_rect()
+        
+        self.rect.x = self.x
+        self.rect.y = self.y
+        
+        self.texto = self.fuente.render(self.contenido, True, self.color_fuente)
+        self.texto_rect = self.texto.get_rect(center=(self.ancho/2, self.alto/2))
+        self.image.blit(self.texto, self.texto_rect)
+    
+    def es_presionado (self, pos, presionado):
+        if self.rect.collidepoint(pos):
+            if presionado[0]:
+                return True
+            return False
+        return False

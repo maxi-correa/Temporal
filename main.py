@@ -8,13 +8,15 @@ class Juego:
         pygame.init() #inicia pygame
         self.screen = pygame.display.set_mode((PANTALLA_ANCHO, PANTALLA_ALTO))
         self.clock = pygame.time.Clock() #Configuracion de FPS
-        #self.fuente = pygame.font.Font('Arial', 32)
+        self.fuente = pygame.font.Font('Arial.ttf', 32)
         self.corriendo = True
         
         self.plantilla_jugador = Plantilla_Sprites('img/character.png')
         self.plantilla_terreno = Plantilla_Sprites('img/terrain.png')
         self.plantilla_enemigo = Plantilla_Sprites('img/enemy.png')
-    
+        self.intro_fondo = pygame.image.load('img/introbackground.png')
+        self.muerte_fondo = pygame.image.load('img/gameover.png')
+        
     def crear_mapa(self):
         for z in CAPA:
             for i, fila in enumerate(MAPA): #i es la posición y fila es el valor
@@ -59,13 +61,55 @@ class Juego:
             self.eventos() #Contiene configuración de teclas
             self.actualizar() #Actualiza la pantalla de juego
             self.mostrar()
-        self.corriendo = False
+        #self.corriendo = False
     
     def game_over(self):
-        pass
-    
+        texto = self.fuente.render('Game Over', True, BLANCO)
+        texto_rect = texto.get_rect(center=(PANTALLA_ANCHO/2, PANTALLA_ALTO/2))
+        
+        boton_restart = Boton(10, PANTALLA_ANCHO - 60 , 120, 50, BLANCO, NEGRO, 'Restart', 32)
+
+        for sprite in self.todos_sprites:
+            sprite.muerte()
+        while self.corriendo:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT():
+                    self.corriendo = False
+            
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_presionado = pygame.mouse.get_pressed()
+            
+            if boton_restart.es_presionado(mouse_pos, mouse_presionado):
+                self.new()
+                self.main()
+            self.screen.blit(self.muerte_fondo, (0,0))
+            self.screen.blit(texto, texto_rect)
+            self.screen.blit(boton_restart, boton_restart.rect)
+            self.clock.tick(FPS)
+            pygame.display.update()
+            
     def intro_screen(self):
-        pass
+        intro = True
+        titulo = self.fuente.render('Awesome Game', True, NEGRO)
+        titulo_rect = titulo.get_rect(x=10, y=10)
+        boton_jugar = Boton(10, 50, 100, 50, BLANCO, NEGRO, 'Play', 32)
+        while intro:
+            for evento in pygame.event.get():
+                if evento.type == pygame.QUIT:
+                    intro = False
+                    self.corriendo = False
+            mouse_pos = pygame.mouse.get_pos()
+            mouse_presionado = pygame.mouse.get_pressed()
+            
+            if boton_jugar.es_presionado(mouse_pos, mouse_presionado):
+                intro = False
+            
+            self.screen.blit(self.intro_fondo, (0,0))
+            self.screen.blit(titulo, titulo_rect)
+            self.screen.blit(boton_jugar.image, boton_jugar.rect)
+            self.clock.tick(FPS)
+            pygame.display.update()
+                
     
 juego = Juego()
 juego.intro_screen()
