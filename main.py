@@ -14,6 +14,7 @@ class Juego:
         self.plantilla_jugador = Plantilla_Sprites('img/character.png')
         self.plantilla_terreno = Plantilla_Sprites('img/terrain.png')
         self.plantilla_enemigo = Plantilla_Sprites('img/enemy.png')
+        self.plantilla_ataque = Plantilla_Sprites('img/attack.png')
         self.intro_fondo = pygame.image.load('img/introbackground.png')
         self.muerte_fondo = pygame.image.load('img/gameover.png')
         
@@ -28,7 +29,7 @@ class Juego:
                     if columna == "E" and z == 3:
                         Enemigo(self, j, i)
                     if columna == "J" and z == 3:
-                        Jugador(self, j, i)
+                        self.jugador = Jugador(self, j, i)
     
     def nuevo(self):
         #comienza un nuevo juego
@@ -41,11 +42,21 @@ class Juego:
         self.crear_mapa()
     
     def eventos(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
                 self.jugando = False
                 self.corriendo = False
-                
+            
+            if evento.type == pygame.KEYDOWN:
+                if evento.key == pygame.K_SPACE:
+                    if self.jugador.direccion == 'arriba':
+                        Ataque(self, self.jugador.rect.x, self.jugador.rect.y - TAMANIO_MOSAICO)
+                    if self.jugador.direccion == 'abajo':
+                        Ataque(self, self.jugador.rect.x, self.jugador.rect.y + TAMANIO_MOSAICO)
+                    if self.jugador.direccion == 'izquierda':
+                        Ataque(self, self.jugador.rect.x - TAMANIO_MOSAICO, self.jugador.rect.y)
+                    if self.jugador.direccion == 'derecha':
+                        Ataque(self, self.jugador.rect.x + TAMANIO_MOSAICO, self.jugador.rect.y)
     def actualizar(self):
         self.todos_sprites.update()
     
@@ -67,24 +78,26 @@ class Juego:
         texto = self.fuente.render('Game Over', True, BLANCO)
         texto_rect = texto.get_rect(center=(PANTALLA_ANCHO/2, PANTALLA_ALTO/2))
         
-        boton_restart = Boton(10, PANTALLA_ANCHO - 60 , 120, 50, BLANCO, NEGRO, 'Restart', 32)
+        boton_restart = Boton (10, PANTALLA_ALTO - 60 , 120, 50, BLANCO, NEGRO, 'Restart', 32)
 
         for sprite in self.todos_sprites:
-            sprite.muerte()
+            sprite.kill()
+        
         while self.corriendo:
             for evento in pygame.event.get():
-                if evento.type == pygame.QUIT():
+                if evento.type == pygame.QUIT:
                     self.corriendo = False
             
             mouse_pos = pygame.mouse.get_pos()
             mouse_presionado = pygame.mouse.get_pressed()
             
             if boton_restart.es_presionado(mouse_pos, mouse_presionado):
-                self.new()
+                self.nuevo()
                 self.main()
+            
             self.screen.blit(self.muerte_fondo, (0,0))
             self.screen.blit(texto, texto_rect)
-            self.screen.blit(boton_restart, boton_restart.rect)
+            self.screen.blit(boton_restart.image, boton_restart.rect)
             self.clock.tick(FPS)
             pygame.display.update()
             

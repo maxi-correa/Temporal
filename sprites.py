@@ -50,6 +50,22 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
         self.x_cambio = 0
         self.y_cambio = 0
     
+        self.animaciones_bajar = [self.juego.plantilla_jugador.get_plantilla(3, 2, self.ancho, self.alto),
+                        self.juego.plantilla_jugador.get_plantilla(35, 2, self.ancho, self.alto),
+                        self.juego.plantilla_jugador.get_plantilla(68, 2, self.ancho, self.alto)]
+
+        self.animaciones_subir = [self.juego.plantilla_jugador.get_plantilla(3, 34, self.ancho, self.alto),
+                        self.juego.plantilla_jugador.get_plantilla(35, 34, self.ancho, self.alto),
+                        self.juego.plantilla_jugador.get_plantilla(68, 34, self.ancho, self.alto)]
+
+        self.animaciones_izquierda = [self.juego.plantilla_jugador.get_plantilla(3, 98, self.ancho, self.alto),
+                        self.juego.plantilla_jugador.get_plantilla(35, 98, self.ancho, self.alto),
+                        self.juego.plantilla_jugador.get_plantilla(68, 98, self.ancho, self.alto)]
+
+        self.animaciones_derecha = [self.juego.plantilla_jugador.get_plantilla(3, 66, self.ancho, self.alto),
+                            self.juego.plantilla_jugador.get_plantilla(35, 66, self.ancho, self.alto),
+                            self.juego.plantilla_jugador.get_plantilla(68, 66, self.ancho, self.alto)]
+    
     def movimiento(self):
         teclas = pygame.key.get_pressed()#Lista de todas las teclas que pueden ser apretadas
         if teclas[pygame.K_LEFT]:
@@ -76,8 +92,9 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
     def colision_enemigo(self):
         choque = pygame.sprite.spritecollide(self, self.juego.enemigos, False)
         if choque:
-            self.muerte()
-            self.juego.corriendo = False
+            self.kill() #borra el sprite de Jugador de la pantalla
+            self.juego.jugando = False #El juego deja de correr
+            #self.juego.corriendo = True
     
     def colision_arboles(self, direccion):
         if direccion == "x":
@@ -105,27 +122,11 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
 
     def animacion(self):
         
-        animaciones_bajar = [self.juego.plantilla_jugador.get_plantilla(3, 2, self.ancho, self.alto),
-                        self.juego.plantilla_jugador.get_plantilla(35, 2, self.ancho, self.alto),
-                        self.juego.plantilla_jugador.get_plantilla(68, 2, self.ancho, self.alto)]
-
-        animaciones_subir = [self.juego.plantilla_jugador.get_plantilla(3, 34, self.ancho, self.alto),
-                        self.juego.plantilla_jugador.get_plantilla(35, 34, self.ancho, self.alto),
-                        self.juego.plantilla_jugador.get_plantilla(68, 34, self.ancho, self.alto)]
-
-        animaciones_izquierda = [self.juego.plantilla_jugador.get_plantilla(3, 98, self.ancho, self.alto),
-                        self.juego.plantilla_jugador.get_plantilla(35, 98, self.ancho, self.alto),
-                        self.juego.plantilla_jugador.get_plantilla(68, 98, self.ancho, self.alto)]
-
-        animaciones_derecha = [self.juego.plantilla_jugador.get_plantilla(3, 66, self.ancho, self.alto),
-                            self.juego.plantilla_jugador.get_plantilla(35, 66, self.ancho, self.alto),
-                            self.juego.plantilla_jugador.get_plantilla(68, 66, self.ancho, self.alto)]
-        
         if self.direccion == "abajo":
             if self.y_cambio == 0: #Si se queda parado
                 self.image = self.juego.plantilla_jugador.get_plantilla(3, 2, self.ancho, self.alto)
             else: #Si se mueve hacia abajo
-                self.image = animaciones_bajar[math.floor(self.bucle_animacion)]
+                self.image = self.animaciones_bajar[math.floor(self.bucle_animacion)]
                 self.bucle_animacion += 0.1
                 if self.bucle_animacion >= 3:
                     self.bucle_animacion = 1
@@ -134,7 +135,7 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
             if self.y_cambio == 0: #Si se queda parado
                 self.image = self.juego.plantilla_jugador.get_plantilla(3, 34, self.ancho, self.alto)
             else: #Si se mueve hacia abajo
-                self.image = animaciones_subir[math.floor(self.bucle_animacion)]
+                self.image = self.animaciones_subir[math.floor(self.bucle_animacion)]
                 self.bucle_animacion += 0.1
                 if self.bucle_animacion >= 3:
                     self.bucle_animacion = 1
@@ -143,7 +144,7 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
             if self.x_cambio == 0: #Si se queda parado
                 self.image = self.juego.plantilla_jugador.get_plantilla(3, 98, self.ancho, self.alto)
             else: #Si se mueve hacia abajo
-                self.image = animaciones_izquierda[math.floor(self.bucle_animacion)]
+                self.image = self.animaciones_izquierda[math.floor(self.bucle_animacion)]
                 self.bucle_animacion += 0.1
                 if self.bucle_animacion >= 3:
                     self.bucle_animacion = 1
@@ -152,11 +153,89 @@ class Jugador(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
             if self.x_cambio == 0: #Si se queda parado
                 self.image = self.juego.plantilla_jugador.get_plantilla(3, 66, self.ancho, self.alto)
             else: #Si se mueve hacia abajo
-                self.image = animaciones_derecha[math.floor(self.bucle_animacion)]
+                self.image = self.animaciones_derecha[math.floor(self.bucle_animacion)]
                 self.bucle_animacion += 0.1
                 if self.bucle_animacion >= 3:
                     self.bucle_animacion = 1
-                    
+
+class Ataque(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas facilmente
+    def __init__(self, juego, x, y): #x, y: coordenadas de lo que aparezca en pantalla
+        self.juego = juego
+        #self.capa = CAPA_ATAQUE #Las capas permiten dar un orden a los sprites
+        self.grupos = self.juego.todos_sprites, self.juego.ataques
+        pygame.sprite.Sprite.__init__(self, self.grupos)
+        
+        self.x = x
+        self.y = y
+        self.ancho = TAMANIO_MOSAICO
+        self.alto = TAMANIO_MOSAICO
+        
+        self.bucle_animacion = 0
+        self.image = self.juego.plantilla_ataque.get_plantilla(0 , 0, self.ancho, self.alto)
+        self.rect = self.image.get_rect()
+        self.rect.x = self.x
+        self.rect.y = self.y
+        
+        self.animaciones_derecha = [self.juego.plantilla_ataque.get_plantilla(0, 64, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(32, 64, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(64, 64, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(96, 64, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(128, 64, self.ancho, self.alto)]
+
+        self.animaciones_abajo = [self.juego.plantilla_ataque.get_plantilla(0, 32, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(32, 32, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(64, 32, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(96, 32, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(128, 32, self.ancho, self.alto)]
+
+        self.animaciones_izquierda = [self.juego.plantilla_ataque.get_plantilla(0, 96, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(32, 96, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(64, 96, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(96, 96, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(128, 96, self.ancho, self.alto)]
+
+        self.animaciones_arriba = [self.juego.plantilla_ataque.get_plantilla(0, 0, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(32, 0, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(64, 0, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(96, 0, self.ancho, self.alto),
+                        self.juego.plantilla_ataque.get_plantilla(128, 0, self.ancho, self.alto)]
+        
+    def update(self):
+        self.colision()
+        self.animacion()
+    
+    def colision(self):
+        #choque = 
+        pygame.sprite.spritecollide(self, self.juego.enemigos, True)
+    
+    def animacion(self):
+        
+        direccion = self.juego.jugador.direccion
+        
+        if direccion == 'arriba':
+            self.image = self.animaciones_arriba[math.floor(self.bucle_animacion)]
+            self.bucle_animacion += 0.5
+            if self.bucle_animacion >= 5:
+                self.kill()
+        
+        if direccion == 'abajo':
+            self.image = self.animaciones_abajo[math.floor(self.bucle_animacion)]
+            self.bucle_animacion += 0.5
+            if self.bucle_animacion >= 5:
+                self.kill()
+        
+        if direccion == 'izquierda':
+            self.image = self.animaciones_izquierda[math.floor(self.bucle_animacion)]
+            self.bucle_animacion += 0.5
+            if self.bucle_animacion >= 5:
+                self.kill()
+        
+        if direccion == 'derecha':
+            self.image = self.animaciones_derecha[math.floor(self.bucle_animacion)]
+            self.bucle_animacion += 0.5
+            if self.bucle_animacion >= 5:
+                self.kill()
+                
 class Enemigo(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas facilmente
     def __init__(self, juego, x, y): #x, y: coordenadas de lo que aparezca en pantalla
         self.juego = juego
@@ -185,6 +264,14 @@ class Enemigo(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
         self.bucle_movimiento = 0
         self.viaje_maximo = random.randint(30, 50)
         
+        self.animaciones_izquierda = [self.juego.plantilla_enemigo.get_plantilla(3, 98, self.ancho, self.alto),
+                        self.juego.plantilla_enemigo.get_plantilla(35, 98, self.ancho, self.alto),
+                        self.juego.plantilla_enemigo.get_plantilla(68, 98, self.ancho, self.alto)]
+
+        self.animaciones_derecha = [self.juego.plantilla_enemigo.get_plantilla(3, 66, self.ancho, self.alto),
+                            self.juego.plantilla_enemigo.get_plantilla(35, 66, self.ancho, self.alto),
+                            self.juego.plantilla_enemigo.get_plantilla(68, 66, self.ancho, self.alto)]
+        
     def update(self):
         self.movimiento()
         self.animacion()
@@ -209,19 +296,11 @@ class Enemigo(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
     
     def animacion(self):
         
-        animaciones_izquierda = [self.juego.plantilla_enemigo.get_plantilla(3, 98, self.ancho, self.alto),
-                        self.juego.plantilla_enemigo.get_plantilla(35, 98, self.ancho, self.alto),
-                        self.juego.plantilla_enemigo.get_plantilla(68, 98, self.ancho, self.alto)]
-
-        animaciones_derecha = [self.juego.plantilla_enemigo.get_plantilla(3, 66, self.ancho, self.alto),
-                            self.juego.plantilla_enemigo.get_plantilla(35, 66, self.ancho, self.alto),
-                            self.juego.plantilla_enemigo.get_plantilla(68, 66, self.ancho, self.alto)]
-        
         if self.direccion == "izquierda":
             if self.x_cambio == 0: #Si se queda parado
                 self.image = self.juego.plantilla_jugador.get_plantilla(3, 98, self.ancho, self.alto)
             else: #Si se mueve hacia abajo
-                self.image = animaciones_izquierda[math.floor(self.bucle_animacion)]
+                self.image = self.animaciones_izquierda[math.floor(self.bucle_animacion)]
                 self.bucle_animacion += 0.1
                 if self.bucle_animacion >= 3:
                     self.bucle_animacion = 1
@@ -230,7 +309,7 @@ class Enemigo(pygame.sprite.Sprite): #Clase en pygame para manejar sprites mas f
             if self.x_cambio == 0: #Si se queda parado
                 self.image = self.juego.plantilla_jugador.get_plantilla(3, 66, self.ancho, self.alto)
             else: #Si se mueve hacia abajo
-                self.image = animaciones_derecha[math.floor(self.bucle_animacion)]
+                self.image = self.animaciones_derecha[math.floor(self.bucle_animacion)]
                 self.bucle_animacion += 0.1
                 if self.bucle_animacion >= 3:
                     self.bucle_animacion = 1
