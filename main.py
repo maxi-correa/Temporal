@@ -13,6 +13,7 @@ class Juego:
         
         self.plantilla_jugador = Plantilla_Sprites('img/character.png')
         self.plantilla_terreno = Plantilla_Sprites('img/terrain.png')
+        self.plantilla_enemigo = Plantilla_Sprites('img/enemy.png')
     
     def crear_mapa(self):
         for z in CAPA:
@@ -22,6 +23,8 @@ class Juego:
                         Piso(self, j, i)
                     if columna == "A" and z == 2:
                         Arbol(self, j, i)
+                    if columna == "E" and z == 3:
+                        Enemigo(self, j, i)
                     if columna == "J" and z == 3:
                         Jugador(self, j, i)
     
