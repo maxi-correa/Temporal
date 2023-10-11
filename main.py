@@ -1,6 +1,7 @@
 import pygame
 from sprites import *
 from constantes import *
+from boton import *
 import sys
 
 class Juego:
@@ -57,6 +58,7 @@ class Juego:
                         Ataque(self, self.jugador.rect.x - TAMANIO_MOSAICO, self.jugador.rect.y)
                     if self.jugador.direccion == 'derecha':
                         Ataque(self, self.jugador.rect.x + TAMANIO_MOSAICO, self.jugador.rect.y)
+    
     def actualizar(self):
         self.todos_sprites.update()
     
@@ -75,54 +77,121 @@ class Juego:
         #self.corriendo = False
     
     def game_over(self):
-        texto = self.fuente.render('Game Over', True, BLANCO)
-        texto_rect = texto.get_rect(center=(PANTALLA_ANCHO/2, PANTALLA_ALTO/2))
         
-        boton_restart = Boton (10, PANTALLA_ALTO - 60 , 120, 50, BLANCO, NEGRO, 'Restart', 32)
+        
+        #texto = self.fuente.render('Game Over', True, BLANCO)
+        #texto_rect = texto.get_rect(center=(PANTALLA_ANCHO/2, PANTALLA_ALTO/2))
+        
+        #boton_restart = Boton (10, PANTALLA_ALTO - 60 , 120, 50, BLANCO, NEGRO, 'Restart', 32)
 
         for sprite in self.todos_sprites:
             sprite.kill()
+        
+        #Carga de imagenes
+        game_over_img = pygame.image.load('imagenes/game_over.png').convert_alpha()
+        restart_img = pygame.image.load('imagenes/restart_btn.png').convert_alpha()
+        quit_2_img = pygame.image.load('imagenes/quit_2_btn.png').convert_alpha()
+        
+                #Instancia de botones
+        boton_resume = Boton(320, 300, restart_img, 1.5)
+        boton_quit_2 = Boton(320, 500, quit_2_img, 1.5)
         
         while self.corriendo:
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     self.corriendo = False
             
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_presionado = pygame.mouse.get_pressed()
+            self.screen.fill(AZUL)
+            #self.screen.blit(game_over_img, [50,50])
+            self.screen.blit(pygame.transform.scale(game_over_img, (600,80)), [100, 100])
             
-            if boton_restart.es_presionado(mouse_pos, mouse_presionado):
+            if boton_resume.dibujar(self.screen):
                 self.nuevo()
                 self.main()
             
-            self.screen.blit(self.muerte_fondo, (0,0))
-            self.screen.blit(texto, texto_rect)
-            self.screen.blit(boton_restart.image, boton_restart.rect)
+            if boton_quit_2.dibujar(self.screen):
+                self.corriendo = False
+            #mouse_pos = pygame.mouse.get_pos()
+            #mouse_presionado = pygame.mouse.get_pressed()
+            
+            #if boton_restart.es_presionado(mouse_pos, mouse_presionado):
+            #    self.nuevo()
+            #    self.main()
+            
+            #self.screen.blit(self.muerte_fondo, (0,0))
+            #self.screen.blit(texto, texto_rect)
+            #self.screen.blit(boton_restart.image, boton_restart.rect)
             self.clock.tick(FPS)
             pygame.display.update()
             
     def intro_screen(self):
         intro = True
-        titulo = self.fuente.render('Awesome Game', True, NEGRO)
-        titulo_rect = titulo.get_rect(x=10, y=10)
-        boton_jugar = Boton(10, 50, 100, 50, BLANCO, NEGRO, 'Play', 32)
+        movimiento_fondo = 0
+        
+        #Carga de imagenes
+        titulo_img = pygame.image.load('imagenes/adventure_time.png').convert_alpha()
+        fondo_img = pygame.image.load('imagenes/fondo.png').convert_alpha()
+        play_img = pygame.image.load('imagenes/play_btn.png').convert_alpha()
+        quit_img = pygame.image.load('imagenes/quit_btn.png').convert_alpha()
+        option_img = pygame.image.load('imagenes/option_btn.png').convert_alpha()
+        sound_on_img = pygame.image.load('imagenes/sound_on_btn.png').convert_alpha()
+        sound_off_img = pygame.image.load('imagenes/sound_off_btn.png').convert_alpha()
+        
+        #Carga de sonido de menú
+        menu_theme = pygame.mixer.Sound('sonidos/menu_theme.ogg')
+        menu_theme.play(-1) #-1 para reproducción infinita
+        tema_menu_encendido = True
+        
+        #Instancia de botones
+        boton_play = Boton(300, 250, play_img, 1)
+        #boton_option = Boton(300, 350, option_img, 1)
+        boton_quit = Boton(300, 450, quit_img, 1)
+        boton_sound_on = Boton (520, 350, sound_on_img, 1.4)
+        boton_sound_off = Boton(620, 350, sound_off_img, 1.4)
+        boton_quit = Boton(300, 450, quit_img, 1)
+        
         while intro:
             for evento in pygame.event.get():
                 if evento.type == pygame.QUIT:
                     intro = False
                     self.corriendo = False
-            mouse_pos = pygame.mouse.get_pos()
-            mouse_presionado = pygame.mouse.get_pressed()
             
-            if boton_jugar.es_presionado(mouse_pos, mouse_presionado):
+            #Fondo en movimiento
+            movimiento_fondo_relativo = movimiento_fondo % fondo_img.get_rect().width
+            self.screen.blit(fondo_img, (movimiento_fondo_relativo - fondo_img.get_rect().width,0))
+            if movimiento_fondo_relativo < PANTALLA_ANCHO:
+                self.screen.blit(fondo_img, (movimiento_fondo_relativo, 0))
+            movimiento_fondo -= 1.5
+            
+            #Título del juego
+            self.screen.blit(titulo_img, [50, -70])
+            self.screen.blit(option_img, [300, 350])
+            
+            #Condiciones de los botones del menú
+            if boton_play.dibujar(self.screen):
                 intro = False
+                menu_theme.stop()
+                #tema_batalla_encendido = True
+                #battle_theme.play(-1)
             
-            self.screen.blit(self.intro_fondo, (0,0))
-            self.screen.blit(titulo, titulo_rect)
-            self.screen.blit(boton_jugar.image, boton_jugar.rect)
-            self.clock.tick(FPS)
-            pygame.display.update()
+            #if boton_option.dibujar(screen):
+            #    print('OPTION')
+            
+            if boton_sound_on.dibujar(self.screen):
+                if tema_menu_encendido == False:
+                    tema_menu_encendido = True
+                    menu_theme.play(-1)
+            
+            if boton_sound_off.dibujar(self.screen):
+                tema_menu_encendido = False
+                menu_theme.stop()
+            
+            if boton_quit.dibujar(self.screen):
+                intro = False
+                self.corriendo = False
                 
+            pygame.display.update()
+            
     
 juego = Juego()
 juego.intro_screen()

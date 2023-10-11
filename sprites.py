@@ -349,7 +349,7 @@ class Piso(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.x = self.x
         self.rect.y = self.y
-
+""""
 class Boton:
     def __init__(self, x, y , ancho, alto, color_fuente, color_fondo, contenido, tamaño):
         self.fuente = pygame.font.Font('Arial.ttf', tamaño)
@@ -380,3 +380,4 @@ class Boton:
                 return True
             return False
         return False
+"""
