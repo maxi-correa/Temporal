@@ -10,6 +10,7 @@ class Juego:
     def __init__(self):
         pygame.init() #inicia pygame
         self.screen = pygame.display.set_mode((PANTALLA_ANCHO, PANTALLA_ALTO))
+        pygame.display.set_caption("Adventure Time")
         self.clock = pygame.time.Clock() #Configuracion de FPS
         #self.fuente = pygame.font.Font('Arial.ttf', 32)
         self.corriendo = True
